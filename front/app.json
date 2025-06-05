@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "MiniTienda",
+    "slug": "MiniTienda",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "entryPoint": "./App.js",
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [],
+    "router": {
+      "origin": "auto"
+    },
+    "android": {
+      "package": "com.anonymous.MiniTienda"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2f277386-42d4-4f5f-bb2a-bc04f8d1178e"
+      }
+    }
+  }
+}

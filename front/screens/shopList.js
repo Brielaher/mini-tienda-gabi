@@ -2,10 +2,18 @@ import React from 'react';
 import { StyleSheet, Text, View, Button, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useCart } from '../context/CartContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
 
 const CartScreen = () => {
   const { cart, removeFromCart, clearCart, incrementQuantity, deleteItem } = useCart();
+  const { validateToken } = useAuth();
 
+  useFocusEffect(
+    React.useCallback(() => {
+      validateToken();
+    }, [])
+  );
   const renderItem = ({ item }) => (
     <View style={styles.cartItem}>
       <Image source={{ uri: item.image }} style={styles.image} />

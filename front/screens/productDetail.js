@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import API from '../utils/api';
 import { useCart } from '../context/CartContext';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ProductDetail = ({ route }) => {
   const { id } = route.params;
@@ -11,6 +14,21 @@ const ProductDetail = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const { user } = useAuth();
+  const navigation = useNavigation();
+  const { validateToken } = useAuth();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      validateToken();
+    }, [])
+  );
+  // Redirigir al login si no está autenticado
+  useEffect(() => {
+    if (!user) {
+      navigation.replace('Login'); // O 'LoginScreen', según cómo hayas nombrado tu ruta
+    }
+  }, [user]);
 
   useEffect(() => {
     API.get(`/products/${id}`)
@@ -22,11 +40,13 @@ const ProductDetail = ({ route }) => {
         console.error(err);
         setLoading(false);
       });
-  }, [id]);
+  }, [id, user]);
+
+  if (!user) return null;
 
   if (loading) {
     return <ActivityIndicator size="large" style={{ flex: 1, justifyContent: 'center' }} />;
-  }
+  } 
 
   if (!product) {
     return (

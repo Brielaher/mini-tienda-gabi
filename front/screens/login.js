@@ -17,14 +17,14 @@ export default function LoginScreen({ navigation }) {
       });
 
       const token = response.data.token;
-
+console.log('Validando token:', token);
       // guardo el token localmente
       await AsyncStorage.setItem('token', token); // guardo el token localmente
       await AsyncStorage.setItem('email', email); // guardo el email localmente
-      login({ email, token }); // le paso al contexto el usuario logueado y el token
+      login({ user: { email }, token });
       console.log('Login realizado con éxito. Token:', token);
       //redirijo a home
-      navigation.navigate('Home');
+      //navigation.replace('Home');
 
     } catch (error) {
       console.error('Error en el login:', error.response?.data || error.message);
@@ -108,12 +108,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 20,
   },
-  login: { 
-    backgroundColor: 'black', 
-    padding: 10, 
+  login: {
+    backgroundColor: 'black',
+    padding: 10,
     marginTop: 20,
-    borderRadius: 5, 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 });

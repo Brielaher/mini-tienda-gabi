@@ -3,13 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, View, ActivityIndicator, StyleSheet } from 'react-native';
 import API from '../utils/api';
-import ProductCard from '../components/productCard'; 
-import CartIcon from '../components/cartIcon'; 
-import { useNavigation } from '@react-navigation/native'; 
+import ProductCard from '../components/productCard';
+import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
 
 const Home = ({ navigation }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { validateToken } = useAuth();
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      validateToken();
+    }, [])
+  );
 
   useEffect(() => {
     API.get('/products')
@@ -30,12 +37,12 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      
+
       <FlatList
         data={products}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item, index }) => (
-          <ProductCard product={item} index={index} navigation={navigation}/>
+          <ProductCard product={item} index={index} navigation={navigation} />
         )}
       />
     </View>

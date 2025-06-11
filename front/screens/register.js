@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import api from '../utils/api';
+import LoginScreen from './login';
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -23,8 +24,9 @@ export default function RegisterScreen({ navigation }) {
   
       // Podés navegar a Home o establecer el usuario como autenticado
       console.log('Usuario registrado con éxito. Token:', token);
-      navigation.navigate('Home');
-  
+      LoginScreen({ user: { name, email }, token });
+      //navigation.navigate('Home');
+      
     } catch (error) {
       console.error('Error en el registro:', error.response?.data || error.message);
       alert('Registro fallido. Revisá tus datos.');

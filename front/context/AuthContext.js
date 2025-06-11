@@ -4,48 +4,68 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); //no logueado
-  const [loading, setLoading] = useState(true); // para evitar el parpadeo mientras carga
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // para evitar mostrar la app mientras valida token
 
-  // Cargar el usuario logueado al iniciar la aplicación
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const storedUser = await AsyncStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (e) {
-        console.error('Error cargando usuario:', e);
-      } finally {
-        setLoading(false);
+const validateToken = async () => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      console.log("No token found, logging out");
+      logout();
+      return false;
+    }
+
+    const response = await fetch("http://localhost:3000/api/auth/validate-token", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const storedUser = await AsyncStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser)); // ✅ restaurar el user
       }
-    };
+      console.log("Token válido ✅");
+      return true;
+    } else {
+      console.log("Token inválido ❌, haciendo logout");
+      logout();
+      return false;
+    }
+  } catch (error) {
+    console.error("Error validando token:", error);
+    logout();
+    return false;
+  } finally {
+    setLoading(false);
+  }
+};
 
-    loadUser();
+
+
+  useEffect(() => {
+    validateToken();
   }, []);
 
   const login = async (userData) => {
-    try {
-      await AsyncStorage.setItem("user", JSON.stringify(userData));
-      setUser(userData);
-    } catch (e) {
-      console.error("Error al guardar sesión:", e);
-    }
+    await AsyncStorage.setItem("token", userData.token);
+    await AsyncStorage.setItem("user", JSON.stringify(userData.user));
+    setUser(userData.user);
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem("token"); // eliminar el token
-    await AsyncStorage.removeItem("email"); // eliminar el usuario
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("user");
     setUser(null);
   };
-
-    if (loading) {
-    return null;
-  }
+const isLoggedIn = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoggedIn: !!user }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, validateToken, isLoggedIn  }}>
       {children}
     </AuthContext.Provider>
   );

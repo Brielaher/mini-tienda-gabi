@@ -20,5 +20,3 @@ app.use('/api/products', productRoutes);
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
 });
-
-
